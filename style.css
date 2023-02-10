@@ -77,9 +77,9 @@ body {
   cursor: pointer;
   color: #fff;
   height: 50px;
-  width: 290px;
+  width: 250px;
   border: none;
-  margin: 10px 54px;
+  margin: 2% 25%;
   background-color: rgb(71, 177, 61);
 }
   
@@ -105,9 +105,9 @@ body {
   cursor: pointer;
   color: #fff;
   height: 30px;
-  width: 240px;
-  border: none;
-  margin: 20px 50px;
+  width: 250px;
+  border: solid;
+  margin: 5% 22%;
   background-color: rgb(71, 177, 61);
 }
 
