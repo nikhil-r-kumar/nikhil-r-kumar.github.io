@@ -1,0 +1,1 @@
+import{Aa as n,Ba as m,Da as r,qa as t}from"./chunk-7ZICLD2L.js";var a=class e{static \u0275fac=function(o){return new(o||e)};static \u0275cmp=t({type:e,selectors:[["app-pomodoro"]],decls:2,vars:0,template:function(o,s){o&1&&(n(0,"p"),r(1,"pomodoro works!"),m())},encapsulation:2})};export{a as Pomodoro};
