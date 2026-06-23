@@ -1,1 +1,0 @@
-import{Ba as i,Ca as n,Fa as r,ra as e}from"./chunk-HVTAHS4L.js";var a=class t{static \u0275fac=function(o){return new(o||t)};static \u0275cmp=e({type:t,selectors:[["app-portfolio"]],decls:2,vars:0,template:function(o,l){o&1&&(i(0,"p"),r(1,"portfolio works!"),n())},encapsulation:2})};export{a as Portfolio};
