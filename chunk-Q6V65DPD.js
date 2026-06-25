@@ -1,1 +1,0 @@
-import{Ja as i,Ka as n,Pa as r,va as e}from"./chunk-YV2LSXKX.js";var a=class t{static \u0275fac=function(o){return new(o||t)};static \u0275cmp=e({type:t,selectors:[["app-portfolio"]],decls:2,vars:0,template:function(o,l){o&1&&(i(0,"p"),r(1,"portfolio works!"),n())},encapsulation:2})};export{a as Portfolio};
