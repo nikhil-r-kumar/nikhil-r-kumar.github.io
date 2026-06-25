@@ -1,0 +1,191 @@
+<main class="resume-page" role="document">
+  <section class="resume-card" aria-labelledby="resume-heading">
+    <header class="resume-header">
+      <div>
+        <h1 id="resume-heading">{{ selectedProfile.name }}</h1>
+        <p class="title">{{ selectedProfile.title }}</p>
+        <p class="contact">
+          {{ selectedProfile.location }} · {{ selectedProfile.email }} · {{ selectedProfile.phone }} · {{ selectedProfile.website }}
+        </p>
+      </div>
+      <div class="no-print profile-controls">
+        <label class="sr-only" for="profile-select">Choose a profile</label>
+        <select id="profile-select" [value]="selectedProfileId" (change)="selectProfile($any($event.target).value)">
+          <option *ngFor="let profile of profiles" [value]="profile.id">{{ profile.name }}</option>
+        </select>
+        <div class="editor-actions">
+          <button type="button" class="secondary-btn" *ngIf="!isEditing" (click)="startEditing()">Edit details</button>
+          <button type="button" class="primary-btn" *ngIf="isEditing" (click)="saveProfile()">Save profile</button>
+          <button type="button" class="secondary-btn" *ngIf="isEditing" (click)="isEditing = false">Cancel</button>
+        </div>
+        <div class="print-badge" aria-label="print-friendly resume" (onClick)="printResume()">Print Ready</div>
+      </div>
+    </header>
+
+    <p class="form-message" *ngIf="formMessage">{{ formMessage }}</p>
+
+    <section class="editor-form" *ngIf="isEditing">
+      <div class="field-grid">
+        <label>
+          Name
+          <input type="text" [(ngModel)]="selectedProfile.name" />
+        </label>
+        <label>
+          Title
+          <input type="text" [(ngModel)]="selectedProfile.title" />
+        </label>
+        <label>
+          Location
+          <input type="text" [(ngModel)]="selectedProfile.location" />
+        </label>
+        <label>
+          Email
+          <input type="email" [(ngModel)]="selectedProfile.email" />
+        </label>
+        <label>
+          Phone
+          <input type="text" [(ngModel)]="selectedProfile.phone" />
+        </label>
+        <label>
+          Website
+          <input type="text" [(ngModel)]="selectedProfile.website" />
+        </label>
+      </div>
+
+      <div class="editor-block">
+        <div class="editor-block-header">
+          <h2>Professional Summary</h2>
+        </div>
+        <label>
+          Summary
+          <textarea rows="4" [(ngModel)]="selectedProfile.summary"></textarea>
+        </label>
+      </div>
+
+      <div class="editor-block">
+        <div class="editor-block-header">
+          <h2>Core Skills</h2>
+          <button type="button" class="secondary-btn" (click)="addSkill()">Add skill</button>
+        </div>
+        <div class="stacked-fields">
+          <label *ngFor="let skill of selectedProfile.skills; let i = index">
+            Skill {{ i + 1 }}
+            <input type="text" [(ngModel)]="selectedProfile.skills[i]" />
+          </label>
+        </div>
+      </div>
+
+      <div class="editor-block">
+        <div class="editor-block-header">
+          <h2>Professional Experience</h2>
+          <button type="button" class="secondary-btn" (click)="addExperience()">Add role</button>
+        </div>
+        <div class="experience-list" *ngFor="let job of selectedProfile.experience; let jobIndex = index">
+          <label>
+            Role
+            <input type="text" [(ngModel)]="selectedProfile.experience[jobIndex].role" />
+          </label>
+          <label>
+            Company
+            <input type="text" [(ngModel)]="selectedProfile.experience[jobIndex].company" />
+          </label>
+          <label>
+            Period
+            <input type="text" [(ngModel)]="selectedProfile.experience[jobIndex].period" />
+          </label>
+          <label>
+            Bullet points (one per line)
+            <textarea
+              rows="4"
+              [ngModel]="selectedProfile.experience[jobIndex].bullets.join('\n')"
+              (ngModelChange)="updateBullets($event, jobIndex)"
+            ></textarea>
+          </label>
+        </div>
+      </div>
+
+      <div class="editor-block two-column-editor">
+        <div>
+          <div class="editor-block-header">
+            <h2>Education</h2>
+            <button type="button" class="secondary-btn" (click)="addEducation()">Add education</button>
+          </div>
+          <div class="stacked-fields" *ngFor="let item of selectedProfile.education; let i = index">
+            <label>
+              Degree
+              <input type="text" [(ngModel)]="selectedProfile.education[i].degree" />
+            </label>
+            <label>
+              Institution
+              <input type="text" [(ngModel)]="selectedProfile.education[i].institution" />
+            </label>
+            <label>
+              Period
+              <input type="text" [(ngModel)]="selectedProfile.education[i].period" />
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <div class="editor-block-header">
+            <h2>Certifications</h2>
+            <button type="button" class="secondary-btn" (click)="addCertification()">Add certification</button>
+          </div>
+          <div class="stacked-fields">
+            <label *ngFor="let cert of selectedProfile.certifications; let i = index">
+              Certification {{ i + 1 }}
+              <input type="text" [(ngModel)]="selectedProfile.certifications[i]" />
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="resume-section" *ngIf="!isEditing">
+      <h2>Professional Summary</h2>
+      <ul>
+        <li>{{ selectedProfile.summary }}</li>
+      </ul>
+    </section>
+
+    <section class="resume-section" *ngIf="!isEditing">
+      <h2>Core Skills</h2>
+      <div class="chips" role="list" aria-label="Core skills">
+        <span class="chip" *ngFor="let skill of selectedProfile.skills">{{ skill }}</span>
+      </div>
+    </section>
+
+    <section class="resume-section" *ngIf="!isEditing">
+      <h2>Professional Experience</h2>
+      <article class="job" *ngFor="let job of selectedProfile.experience">
+        <div class="job-header">
+          <div>
+            <h3>{{ job.role }}</h3>
+            <p class="company">{{ job.company }}</p>
+          </div>
+          <span class="period">{{ job.period }}</span>
+        </div>
+        <ul>
+          <li *ngFor="let bullet of job.bullets">{{ bullet }}</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="resume-section two-column" *ngIf="!isEditing">
+      <div>
+        <h2>Education</h2>
+        <article class="detail-block" *ngFor="let item of selectedProfile.education">
+          <h3>{{ item.degree }}</h3>
+          <p>{{ item.institution }}</p>
+          <p class="period">{{ item.period }}</p>
+        </article>
+      </div>
+      <div>
+        <h2>Certifications</h2>
+        <ul>
+          <li *ngFor="let cert of selectedProfile.certifications">{{ cert }}</li>
+        </ul>
+      </div>
+    </section>
+  </section>
+</main>
