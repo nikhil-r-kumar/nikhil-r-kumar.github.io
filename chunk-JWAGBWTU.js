@@ -1,0 +1,1 @@
+import{Ka as o,La as n,Qa as a,wa as r}from"./chunk-54LKHWW7.js";var c=class t{static \u0275fac=function(e){return new(e||t)};static \u0275cmp=r({type:t,selectors:[["app-grocery"]],decls:2,vars:0,template:function(e,i){e&1&&(o(0,"p"),a(1,"grocery works!"),n())},encapsulation:2})};export{c as Grocery};
