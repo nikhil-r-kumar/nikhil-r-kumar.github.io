@@ -1,13 +1,21 @@
 <div class="pomodoro-container">
-  <h1>🍅 Pomodoro Timer</h1>
+  <div class="pomodoro-card">
+    <p class="eyebrow">Focus Session</p>
+    <h1>Pomodoro Timer</h1>
+    <p class="subtitle">Stay present. Work with intent. Breathe and reset.</p>
 
-  <div class="timer">
-    {{ minutes }}:{{ seconds }}
-  </div>
+    <div class="status-pill" [class.active]="!isRunning">
+      {{ isRunning ? 'Running' : 'Paused' }}
+    </div>
 
-  <div class="actions">
-    <button (click)="start()">Start</button>
-    <button (click)="pause()">Pause</button>
-    <button (click)="reset()">Reset</button>
+    <div class="timer-shell">
+      <div class="timer">{{ minutes }}:{{ seconds }}</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" (click)="start()">Start</button>
+      <button class="btn btn-secondary" (click)="pause()">Pause</button>
+      <button class="btn btn-ghost" (click)="reset()">Reset</button>
+    </div>
   </div>
 </div>

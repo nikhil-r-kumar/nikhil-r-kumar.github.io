@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
 
 @Component({
   selector: 'app-pomodoro',
@@ -7,6 +7,8 @@ import { Component, OnDestroy } from '@angular/core';
   styleUrl: './pomodoro.scss',
 })
 export class Pomodoro implements OnDestroy {
+  constructor(private readonly cdr: ChangeDetectorRef) {}
+
   totalSeconds = 25 * 60;
   remainingSeconds = this.totalSeconds;
 
@@ -22,6 +24,7 @@ export class Pomodoro implements OnDestroy {
     this.intervalId = window.setInterval(() => {
       if (this.remainingSeconds > 0) {
         this.remainingSeconds = this.remainingSeconds - 1;
+        this.cdr.detectChanges();
       } else {
         this.pause();
         alert('Pomodoro Complete!');
