@@ -1,0 +1,9 @@
+[build]
+  command = "cd nikhil-home && npm install && npm run build"
+  publish = "nikhil-home/dist/nikhil-home/browser"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

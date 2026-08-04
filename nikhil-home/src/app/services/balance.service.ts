@@ -6,6 +6,11 @@ import { StorageService } from './storage.service';
 const PERSONS_KEY = 'balance-tracker-persons';
 const ENTRIES_KEY = 'balance-tracker-entries';
 
+interface InitialData {
+  persons: Person[];
+  entries: Entry[];
+}
+
 export const ENTRY_TYPE_LABELS: Record<EntryType, string> = {
   lent: 'Lent Money',
   borrowed: 'Borrowed Money',
@@ -170,13 +175,100 @@ export class BalanceService {
   }
 
   private load(): void {
-    this.persons.set(this.storage.load<Person[]>(PERSONS_KEY, []));
-    this.entries.set(this.storage.load<Entry[]>(ENTRIES_KEY, []));
+    void this.loadRemoteData().then((loaded) => {
+      if (loaded) {
+        return;
+      }
+
+      const storedPersons = this.storage.load<Person[]>(PERSONS_KEY, []);
+      const storedEntries = this.storage.load<Entry[]>(ENTRIES_KEY, []);
+
+      if (storedPersons.length && storedEntries.length) {
+        this.persons.set(storedPersons);
+        this.entries.set(storedEntries);
+        return;
+      }
+
+      this.persons.set(storedPersons);
+      this.entries.set(storedEntries);
+
+      this.loadInitialData().catch(() => {
+        // If JSON load fails, keep local storage data or empty state.
+      });
+    });
+  }
+
+  private async loadRemoteData(): Promise<boolean> {
+    try {
+      const response = await fetch('/.netlify/functions/entries', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        return false;
+      }
+
+      const data = (await response.json()) as InitialData;
+      if (!data?.persons?.length || !data?.entries?.length) {
+        return false;
+      }
+
+      this.persons.set(data.persons);
+      this.entries.set(data.entries);
+      this.storage.save(PERSONS_KEY, this.persons());
+      this.storage.save(ENTRIES_KEY, this.entries());
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private async loadInitialData(): Promise<void> {
+    const response = await fetch('entries.json');
+    if (!response.ok) {
+      return;
+    }
+
+    const initialData = (await response.json()) as InitialData;
+    if (!initialData?.persons?.length || !initialData?.entries?.length) {
+      return;
+    }
+
+    const storedPersons = this.storage.load<Person[]>(PERSONS_KEY, []);
+    const storedEntries = this.storage.load<Entry[]>(ENTRIES_KEY, []);
+    if (storedPersons.length || storedEntries.length) {
+      return;
+    }
+
+    this.persons.set(initialData.persons);
+    this.entries.set(initialData.entries);
+    this.save();
   }
 
   private save(): void {
     this.storage.save(PERSONS_KEY, this.persons());
     this.storage.save(ENTRIES_KEY, this.entries());
+    void this.saveRemoteData();
+  }
+
+  private async saveRemoteData(): Promise<void> {
+    try {
+      await fetch('/.netlify/functions/entries', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          persons: this.persons(),
+          entries: this.entries(),
+        }),
+      });
+    } catch {
+      // Keep local storage for offline use.
+    }
   }
 
   private createId(): string {
