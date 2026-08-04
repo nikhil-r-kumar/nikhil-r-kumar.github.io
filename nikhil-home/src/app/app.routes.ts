@@ -26,4 +26,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/resume/resume').then(m => m.Resume),
   },
+  {
+    path: 'balance-tracker',
+    loadComponent: () =>
+      import('./pages/balance-tracker/balance-tracker').then(m => m.BalanceTracker),
+  },
 ];

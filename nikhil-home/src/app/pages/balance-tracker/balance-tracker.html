@@ -1,0 +1,177 @@
+<div class="tracker-shell">
+  <header class="tracker-hero">
+    <div>
+      <p class="eyebrow">Balance Tracker</p>
+      <h1>Track money borrowed and lent</h1>
+      <p class="subtitle">Manage people, entries, and net balances with a responsive dashboard.</p>
+    </div>
+
+    <div class="hero-actions">
+      <div class="stat-card">
+        <span class="stat-label">To receive</span>
+        <span class="stat-value positive">{{ totals.receive | number:'1.0-0' }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">To pay</span>
+        <span class="stat-value negative">{{ totals.pay | number:'1.0-0' }}</span>
+      </div>
+      <div class="stat-card balance-card">
+        <span class="stat-label">Net balance</span>
+        <span class="stat-value" [ngClass]="getBalanceClass(totals.net)">
+          {{ totals.net | currency:'USD':'symbol':'1.2-2' }}
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <section class="dashboard-grid">
+    <aside class="people-panel">
+      <div class="panel-header">
+        <div>
+          <h2>People</h2>
+          <p class="panel-description">Search contacts or choose someone to view details.</p>
+        </div>
+        <button class="fab-button" type="button" (click)="toggleAddEntry()">+</button>
+      </div>
+
+      <label class="field-label search-field">
+        Search people
+        <input type="search" (input)="searchPeople($any($event.target).value)" placeholder="Search by name" />
+      </label>
+
+      <div class="people-groups">
+        <div class="people-group">
+          <h3>To Receive</h3>
+          <div *ngIf="!balance.toReceive().length" class="empty-note">None yet.</div>
+          <button
+            *ngFor="let person of balance.toReceive()"
+            class="person-chip"
+            [class.active]="selectedPerson?.id === person.id"
+            (click)="selectPerson(person.id)">
+            <span>{{ person.name }}</span>
+            <span class="chip-balance positive">{{ balance.formatCurrency(balance.getPersonNet(person.id)) }}</span>
+          </button>
+        </div>
+
+        <div class="people-group">
+          <h3>To Pay</h3>
+          <div *ngIf="!balance.toPay().length" class="empty-note">None yet.</div>
+          <button
+            *ngFor="let person of balance.toPay()"
+            class="person-chip"
+            [class.active]="selectedPerson?.id === person.id"
+            (click)="selectPerson(person.id)">
+            <span>{{ person.name }}</span>
+            <span class="chip-balance negative">{{ balance.formatCurrency(balance.getPersonNet(person.id)) }}</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="right-panel">
+      <section class="entry-panel" *ngIf="showAddEntry">
+        <div class="panel-header">
+          <div>
+            <h2>Add Entry</h2>
+            <p class="panel-description">Choose an existing contact or enter a new person name.</p>
+          </div>
+          <button class="icon-button" type="button" (click)="toggleAddEntry()">✕</button>
+        </div>
+
+        <label class="field-label">
+          Person
+          <select [(ngModel)]="newEntryPersonId">
+            <option [ngValue]="''">Choose existing person</option>
+            <option *ngFor="let person of balance.people()" [ngValue]="person.id">{{ person.name }}</option>
+          </select>
+        </label>
+
+        <label class="field-label">
+          Or new person
+          <input type="text" [(ngModel)]="newPersonName" placeholder="Person name" />
+        </label>
+
+        <label class="field-label">
+          Amount
+          <input type="number" min="0" [(ngModel)]="newAmount" />
+        </label>
+
+        <label class="field-label">
+          Type
+          <select [(ngModel)]="newEntryType">
+            <option *ngFor="let key of entryTypes" [value]="key">{{ entryTypeLabels[key] }}</option>
+          </select>
+        </label>
+
+        <label class="field-label">
+          Date
+          <input type="date" [(ngModel)]="newDate" />
+        </label>
+
+        <label class="field-label">
+          Note
+          <textarea rows="3" [(ngModel)]="newNote"></textarea>
+        </label>
+
+        <div class="action-row">
+          <button class="primary-button" type="button" (click)="addEntry()">
+            {{ editingEntryId ? 'Update entry' : 'Save entry' }}
+          </button>
+          <button class="secondary-button" type="button" *ngIf="editingEntryId" (click)="cancelEdit()">Cancel</button>
+        </div>
+      </section>
+
+      <section class="details-panel">
+        <div class="panel-header">
+          <div>
+            <h2>{{ selectedPerson ? selectedPerson.name : 'Select a person' }}</h2>
+            <p class="panel-description">
+              {{ selectedPerson ? 'View transaction history and net balance.' : 'Pick a person from the list to see details.' }}
+            </p>
+          </div>
+        </div>
+
+        <div *ngIf="selectedPerson; else noSelection">
+          <div class="person-summary">
+            <div>
+              <span class="summary-label">Net balance</span>
+              <span class="summary-value" [ngClass]="getBalanceClass(balance.getPersonNet(selectedPerson.id))">
+                {{ balance.formatCurrency(balance.getPersonNet(selectedPerson.id)) }}
+              </span>
+            </div>
+            <div>
+              <span class="summary-label">Transactions</span>
+              <span class="summary-value">{{ balance.selectedPersonEntries().length }}</span>
+            </div>
+          </div>
+
+          <ul class="entry-list">
+            <li *ngFor="let entry of balance.selectedPersonEntries()" class="entry-row">
+              <div>
+                <p class="entry-title">{{ entry.note || entry.type }}</p>
+                <p class="entry-meta">{{ entry.date }} · {{ entryTypeLabels[entry.type] }}</p>
+              </div>
+              <div class="entry-actions">
+                <span [ngClass]="getBalanceClass(balance.getSignedAmount(entry))">
+                  {{ balance.getSignedAmount(entry) >= 0 ? '+' : '-' }}{{ formatAbsoluteEntryValue(balance.getSignedAmount(entry)) }}
+                </span>
+                <button class="icon-button edit" type="button" (click)="editEntry(entry)">
+                  ✎
+                </button>
+                <button class="icon-button danger" type="button" (click)="removeEntry(entry.id)">
+                  🗑
+                </button>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <ng-template #noSelection>
+          <div class="empty-note">Select a person to review their history.</div>
+        </ng-template>
+      </section>
+    </div>
+  </section>
+
+  <button class="floating-add" type="button" (click)="toggleAddEntry()">+ Add entry</button>
+</div>

@@ -30,5 +30,10 @@ export class Home {
       description: 'View a print-friendly resume layout.',
       route: '/resume',
     },
+    {
+      title: '💰 Balance Tracker',
+      description: 'Track money lent and borrowed with people, receipts, and balances.',
+      route: '/balance-tracker',
+    },
   ];
 }
