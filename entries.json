@@ -1,38 +1,6 @@
 {
   "persons": [
-    {
-      "id": "person-1",
-      "name": "Aarav Sharma"
-    },
-    {
-      "id": "person-2",
-      "name": "Mia Patel"
-    }
   ],
   "entries": [
-    {
-      "id": "entry-1",
-      "personId": "person-1",
-      "amount": 1200,
-      "type": "lent",
-      "date": "2026-08-04",
-      "note": "Project advance payment"
-    },
-    {
-      "id": "entry-2",
-      "personId": "person-1",
-      "amount": 300,
-      "type": "received",
-      "date": "2026-08-16",
-      "note": "Partial repayment"
-    },
-    {
-      "id": "entry-3",
-      "personId": "person-2",
-      "amount": 450,
-      "type": "borrowed",
-      "date": "2026-08-12",
-      "note": "Shared equipment cost"
-    }
   ]
 }
